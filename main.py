@@ -1,34 +1,31 @@
-from cmath import nan
 import requests
 import pandas as pd
+import sys
 
-url_currency = "https://poe.ninja/api/data/currencyoverview"
-url_item = "https://poe.ninja/api/data/itemoverview"
+url = "https://poe.ninja/api/data/"
 
+overview_choice = input('Choose: \n1. Currency \n2. Item\n')
+overview = 'overview/'
+
+if overview_choice == '1':
+    overview = 'currency' + overview
+elif overview_choice == '2':
+    overview = 'item' + overview
+else:
+    sys.exit("Did not enter a valid option.")
+
+league = input('Which league?')
+type = input('Which type?\nCurrency (Currency)\nFragment (Currency)\nArtifact (Item)\nOil (Item)\nIncubator (Item)\nScarab (Item)\nFossil (Item)\nResonator (Item)\nEssence (Item)\nDivinationCard (Item)\nSkillGem (Item)\nBaseType (Item)\nHelmetEnchant (Item)\nUniqueMap (Item)\nMap (Item)\nUniqueJewel (Item)\nUniqueFlask (Item)\nUniqueWeapon (Item)\nUniqueArmour (Item)\nUniqueAccessory (Item)\nBeast (Item)\nDeliriumOrb (Item)\nInvitation (Item)\nClusterJewel (Item)\nVial (Item)\n')
 
 def construct_url(url_base, league, type):
     return url_base + "?league=" + league + "&type=" + type
 
-div_card = construct_url(url_item, "Kalandra", "DivinationCard")
-response = requests.get(div_card)
+final_url = construct_url(url + overview, league, type)
+
+response = requests.get(final_url)
 data = response.json()
 requests.session().close()
 
 df = pd.DataFrame(data["lines"])
-
-columns_to_drop = ["id", "icon", "artFilename", "itemClass", "count", "detailsId", "listingCount", "sparkline", "lowConfidenceSparkline", "implicitModifiers", "explicitModifiers", "flavourText", "exaltedValue"]
-df.drop(columns_to_drop, axis=1, inplace=True)
-
-df.fillna(value=float(1), axis=1, inplace=True)
-
-def stack_price_in_chaos(row):
-    return row.chaosValue * row.stackSize
-
-def stack_price_in_divine(row):
-    return row.divineValue * row.stackSize
-
-df['stackPriceInChaos'] = df.apply(lambda row: stack_price_in_chaos(row), axis=1)
-
-df['stackPriceInDivine'] = df.apply(lambda row: stack_price_in_divine(row), axis=1)
 
 df.to_csv('out.csv', index=False)
