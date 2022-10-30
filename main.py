@@ -32,7 +32,10 @@ columns_to_drop = []
 if overview_choice == '1':
     columns_to_drop = ['paySparkLine', 'receiveSparkLine', 'lowConfidencePaySparkLine', 'lowConfidenceReceiveSparkLine', 'detailsId', 'pay', 'receive']
 elif overview_choice == '2':
-    columns_to_drop = ['id', 'icon', 'artFilename', 'itemClass', 'count', 'detailsId', 'listingCount', 'sparkline', 'lowConfidenceSparkline', 'implicitModifiers', 'explicitModifiers', 'flavourText']
+    columns_to_drop = ['id', 'icon', 'itemClass', 'count', 'detailsId', 'listingCount', 'sparkline', 'lowConfidenceSparkline', 'implicitModifiers', 'explicitModifiers', 'flavourText']
 df.drop(columns_to_drop, axis=1, inplace=True)
+
+if type == "DivinationCard":
+    df.drop(['artFilename'], axis=1, inplace=True)
 
 df.to_csv('out.csv', index=False)
